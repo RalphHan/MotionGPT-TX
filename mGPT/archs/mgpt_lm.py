@@ -51,8 +51,10 @@ class MLM(nn.Module):
         # Instantiate language model
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, legacy=True)
         if model_type == "t5":
-            self.language_model = T5ForConditionalGeneration.from_pretrained(
-                model_path)
+            from transformers import T5Config
+            self.language_model = T5ForConditionalGeneration(T5Config.from_pretrained(model_path))
+            # self.language_model = T5ForConditionalGeneration.from_pretrained(
+            #     model_path)
             self.lm_type = 'encdec'
         elif model_type == "gpt2":
             self.language_model = GPT2LMHeadModel.from_pretrained(model_path)

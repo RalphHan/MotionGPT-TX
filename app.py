@@ -34,11 +34,11 @@ state_dict = torch.load(cfg.TEST.CHECKPOINTS, map_location="cpu")["state_dict"]
 model.load_state_dict(state_dict)
 model.to(device)
 
-audio_processor = WhisperProcessor.from_pretrained(cfg.model.whisper_path)
-audio_model = WhisperForConditionalGeneration.from_pretrained(cfg.model.whisper_path).to(device)
-forced_decoder_ids = audio_processor.get_decoder_prompt_ids(language="zh", task="translate")
-forced_decoder_ids_zh = audio_processor.get_decoder_prompt_ids(language="zh", task="translate")
-forced_decoder_ids_en = audio_processor.get_decoder_prompt_ids(language="en", task="translate")
+# audio_processor = WhisperProcessor.from_pretrained(cfg.model.whisper_path)
+# audio_model = WhisperForConditionalGeneration.from_pretrained(cfg.model.whisper_path).to(device)
+# forced_decoder_ids = audio_processor.get_decoder_prompt_ids(language="zh", task="translate")
+# forced_decoder_ids_zh = audio_processor.get_decoder_prompt_ids(language="zh", task="translate")
+# forced_decoder_ids_en = audio_processor.get_decoder_prompt_ids(language="en", task="translate")
 
 # HTML Style
 Video_Components = """
@@ -195,22 +195,22 @@ def add_text(history, text, motion_uploaded, data_stored, method):
                               interactive=False), motion_uploaded, data_stored
 
 
-def add_audio(history, audio_path, data_stored):
-    audio, sampling_rate = librosa.load(audio_path, sr=16000)
-    input_features = audio_processor(
-        audio, sampling_rate, return_tensors="pt"
-    ).input_features  # whisper training sampling rate, do not modify
-    input_features = torch.Tensor(input_features).to(device)
-    predicted_ids = audio_model.generate(input_features,
-                                         forced_decoder_ids=forced_decoder_ids)
-    text_input = audio_processor.batch_decode(predicted_ids,
-                                              skip_special_tokens=True)
-    text_input = str(text_input).strip('[]"')
-    data_stored = data_stored + [{'user_input': text_input}]
-    gr.update(value=data_stored, interactive=False)
-    history = history + [(text_input, None)]
-
-    return history, data_stored
+# def add_audio(history, audio_path, data_stored):
+#     audio, sampling_rate = librosa.load(audio_path, sr=16000)
+#     input_features = audio_processor(
+#         audio, sampling_rate, return_tensors="pt"
+#     ).input_features  # whisper training sampling rate, do not modify
+#     input_features = torch.Tensor(input_features).to(device)
+#     predicted_ids = audio_model.generate(input_features,
+#                                          forced_decoder_ids=forced_decoder_ids)
+#     text_input = audio_processor.batch_decode(predicted_ids,
+#                                               skip_special_tokens=True)
+#     text_input = str(text_input).strip('[]"')
+#     data_stored = data_stored + [{'user_input': text_input}]
+#     gr.update(value=data_stored, interactive=False)
+#     history = history + [(text_input, None)]
+#
+#     return history, data_stored
 
 
 def add_file(history, file, txt, motion_uploaded):
@@ -351,10 +351,10 @@ with gr.Blocks(css=customCSS) as demo:
     file_msg = btn.upload(add_file, [chatbot, btn, txt, motion_uploaded],
                           [chatbot, txt, motion_uploaded],
                           queue=False)
-    aud_msg = aud.stop_recording(
-        add_audio, [chatbot, aud, data_stored], [chatbot, data_stored],
-        queue=False).then(bot, [chatbot, motion_uploaded, data_stored, method],
-                          [chatbot, motion_uploaded, data_stored])
+    # aud_msg = aud.stop_recording(
+    #     add_audio, [chatbot, aud, data_stored], [chatbot, data_stored],
+    #     queue=False).then(bot, [chatbot, motion_uploaded, data_stored, method],
+    #                       [chatbot, motion_uploaded, data_stored])
     regen_msg = regen.click(bot,
                             [chatbot, motion_uploaded, data_stored, method],
                             [chatbot, motion_uploaded, data_stored])
